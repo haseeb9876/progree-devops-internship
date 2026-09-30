@@ -1,106 +1,68 @@
-# Wanderlust - Your Ultimate Travel Blog 🌍✈️
+# Progree DevOps Internship — Haseeb Ullah
 
-WanderLust is a simple MERN travel blog website ✈ This project is aimed to help people to contribute in open source, upskill in react and also master git.
+A DevOps portfolio project built around the MIT-licensed **Wanderlust** travel
+blog application. Task 2 packages a React frontend, an Express API, MongoDB, and
+Redis into an isolated Docker Compose environment.
 
-![Preview Image](https://github.com/krishnaacharyaa/wanderlust/assets/116620586/17ba9da6-225f-481d-87c0-5d5a010a9538)
+> Application credit: [Krishna R Acharya and Wanderlust contributors](https://github.com/krishnaacharyaa/wanderlust).
+> My contribution is the container infrastructure, runtime configuration,
+> verification, and internship documentation. The original [MIT license](LICENSE)
+> and [upstream setup guide](docs/upstream-wanderlust.md) are preserved.
 
-## [Figma Design File](https://www.figma.com/file/zqNcWGGKBo5Q2TwwVgR6G5/WanderLust--A-Travel-Blog-App?type=design&node-id=0%3A1&mode=design&t=c4oCG8N1Fjf7pxTt-1)
-## [Discord Channel](https://discord.gg/FEKasAdCrG)
+## Run locally
 
-## 🎯 Goal of this project
+On Ubuntu with Docker Engine, Docker Compose, and Python 3 installed:
 
-At its core, this project embodies two important aims:
+```bash
+python3 scripts/setup-local.py
+docker compose up -d --build --wait --wait-timeout 180
+python3 scripts/seed-demo.py
+```
 
-1. **Start Your Open Source Journey**: It's aimed to kickstart your open-source journey. Here, you'll learn the basics of Git and get a solid grip on the MERN stack and I strongly believe that learning and building should go hand in hand.
-2. **React Mastery**: Once you've got the basics down, a whole new adventure begins of mastering React. This project covers everything, from simple form validation to advanced performance enhancements. And I've planned much more cool stuff to add in the near future if the project hits more number of contributors.
+Open **http://localhost:8080**. The setup script generates private local
+credentials and preserves them on subsequent runs. No cloud account is needed.
 
-_I'd love for you to make the most of this project - it's all about learning, helping, and growing in the open-source world._
+## Task 2 deliverables
 
-## Setting up the project locally
+- Multi-stage frontend and backend Dockerfiles.
+- Small runtime images: static frontend assets and production-only backend dependencies.
+- Compose secret files, an application-scoped database user, and excluded local credentials.
+- Nginx routing for the website and API through one localhost port.
+- Private database/cache networking, persistent MongoDB volumes, and service health checks.
+- Repeatable HTTP checks, data-persistence verification, and image-size evidence.
 
-### Setting up the Backend
+Read the [Task 2 guide](docs/task-2/README.md) for requirement mapping, architecture,
+configuration, troubleshooting, and operational limits.
 
-1. **Fork and Clone the Repository**
+```bash
+docker compose ps
+python3 scripts/verify-task2.py --recreate
+```
 
-   ```bash
-   git clone https://github.com/{your-username}/wanderlust.git
-   ```
+The verification creates and removes its own test post. The `--recreate` option
+recreates only this project's containers to prove data persists in named volumes.
 
-2. **Navigate to the Backend Directory**
+## Evidence
 
-   ```bash
-   cd backend
-   ```
+[Download the Task 2 PDF report](docs/task-2/Task-2-Containerization-Report.pdf).
 
-3. **Install Required Dependencies**
+![Wanderlust running in Docker](docs/task-2/evidence/homepage.png)
 
-   ```bash
-   npm i
-   ```
+Measured results, application screenshots, and the Task 2 report are stored in
+[docs/task-2](docs/task-2/). The report is a component for the final combined
+internship PDF; it is not a claim that Tasks 3 and 4 are completed.
 
-4. **Set up your MongoDB Database**
+## Stop
 
-   - Open MongoDB Compass and connect MongoDB locally at `mongodb://localhost:27017`.
+```bash
+docker compose down
+```
 
-5. **Import sample data**
+This preserves database volumes. Keep `.secrets/` alongside the local project;
+it is intentionally excluded from Git. See the guide before rotating credentials.
 
-   > To populate the database with sample posts, you can copy the content from the `backend/data/sample_posts.json` file and insert it as a document in the `wanderlust/posts` collection in your local MongoDB database using either MongoDB Compass or `mongoimport`.
+## Scope
 
-   ```bash
-   mongoimport --db wanderlust --collection posts --file ./data/sample_posts.json --jsonArray
-   ```
-
-6. **Configure Environment Variables**
-
-   ```bash
-   cp .env.sample .env
-   ```
-
-7. **Start the Backend Server**
-
-   ```bash
-   npm start
-   ```
-
-   > You should see the following on your terminal output on successful setup.
-   >
-   > ```bash
-   > [BACKEND] Server is running on port 5000
-   > [BACKEND] Database connected: mongodb://127.0.0.1/wanderlust
-   > ```
-
-### Setting up the Frontend
-
-1. **Open a New Terminal**
-
-   ```bash
-   cd frontend
-   ```
-
-2. **Install Dependencies**
-
-   ```bash
-   npm i
-   ```
-
-3. **Configure Environment Variables**
-
-   ```bash
-   cp .env.sample .env.local
-   ```
-
-4. **Launch the Development Server**
-
-   ```bash
-   npm run dev
-   ```
-
-## 🌟 Ready to Contribute?
-
-Kindly go through [CONTRIBUTING.md](https://github.com/krishnaacharyaa/wanderlust/blob/main/.github/CONTRIBUTING.md) to understand everything from setup to contributing guidelines.
-
-## 💖 Show Your Support
-
-If you find this project interesting and inspiring, please consider showing your support by starring it on GitHub! Your star goes a long way in helping me reach more developers and encourages me to keep enhancing the project.
-
-🚀 Feel free to get in touch with me for any further queries or support, happy to help :)
+This is a localhost internship demonstration. It reuses the upstream application;
+OAuth and a production application-security review are outside Task 2. Tasks 3
+(CI/CD) and 4 (Terraform/Kubernetes) will build on this project separately.

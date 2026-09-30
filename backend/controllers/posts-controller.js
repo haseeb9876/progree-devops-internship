@@ -5,6 +5,10 @@ import {
   storeDataInCache,
 } from '../utils/cache-posts.js';
 import { HTTP_STATUS, REDIS_KEYS, RESPONSE_MESSAGES, validCategories } from '../utils/constants.js';
+async function invalidatePostLists() {
+  await Promise.all(Object.values(REDIS_KEYS).map(deleteDataFromCache));
+}
+
 export const createPostHandler = async (req, res) => {
   try {
     const {
@@ -47,12 +51,8 @@ export const createPostHandler = async (req, res) => {
       isFeaturedPost,
     });
 
-    const [savedPost] = await Promise.all([
-      post.save(), // Save the post
-      deleteDataFromCache(REDIS_KEYS.ALL_POSTS), // Invalidate cache for all posts
-      deleteDataFromCache(REDIS_KEYS.FEATURED_POSTS), // Invalidate cache for featured posts
-      deleteDataFromCache(REDIS_KEYS.LATEST_POSTS), // Invalidate cache for latest posts
-    ]);
+    const savedPost = await post.save();
+    await invalidatePostLists();
 
     res.status(HTTP_STATUS.OK).json(savedPost);
   } catch (err) {
@@ -133,6 +133,7 @@ export const updatePostHandler = async (req, res) => {
       return res.status(HTTP_STATUS.NOT_FOUND).json({ message: RESPONSE_MESSAGES.POSTS.NOT_FOUND });
     }
 
+    await invalidatePostLists();
     res.status(HTTP_STATUS.OK).json(updatedPost);
   } catch (err) {
     res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({ message: err.message });
@@ -148,6 +149,7 @@ export const deletePostByIdHandler = async (req, res) => {
       return res.status(HTTP_STATUS.NOT_FOUND).json({ message: RESPONSE_MESSAGES.POSTS.NOT_FOUND });
     }
 
+    await invalidatePostLists();
     res.status(HTTP_STATUS.OK).json({ message: RESPONSE_MESSAGES.POSTS.DELETED });
   } catch (err) {
     res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({ message: err.message });

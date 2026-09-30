@@ -1,3 +1,4 @@
+import { JWT_SECRET } from '../config/utils.js';
 import User from '../models/user.js';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
@@ -21,10 +22,10 @@ export const signUpWithEmail = async (req, res, next) => {
     }
     const hashedPassword = await hash(password, 10);
     const newUser = await User.create({ name, email, password: hashedPassword });
-    const accessToken = sign({ name, _id: newUser._id }, process.env.JWT_SECRET, {
+    const accessToken = sign({ name, _id: newUser._id }, JWT_SECRET, {
       expiresIn: process.env.ACCESS_TOKEN_EXPIRES_IN,
     });
-    const refreshToken = sign({ name, _id: newUser._id }, process.env.JWT_SECRET, {
+    const refreshToken = sign({ name, _id: newUser._id }, JWT_SECRET, {
       expiresIn: process.env.REFRESH_TOKEN_EXPIRES_IN,
     });
     res.cookie('access_token', accessToken, accessCookieOptions);
@@ -63,14 +64,14 @@ export const signInWithEmail = async (req, res, next) => {
     if (isUserExists && compareSync(password, isUserExists.password)) {
       accessToken = sign(
         { name: isUserExists.name, _id: isUserExists._id },
-        process.env.JWT_SECRET,
+        JWT_SECRET,
         {
           expiresIn: process.env.ACCESS_TOKEN_EXPIRES_IN,
         }
       );
       refreshToken = sign(
         { name: isUserExists.name, _id: isUserExists._id },
-        process.env.JWT_SECRET,
+        JWT_SECRET,
         {
           expiresIn: process.env.REFRESH_TOKEN_EXPIRES_IN,
         }
@@ -150,10 +151,10 @@ export const signUpWithGoogle = async (req, res, next) => {
       email,
     });
     const payload = { name, _id: newUser._id };
-    const accessToken = sign(payload, process.env.JWT_SECRET, {
+    const accessToken = sign(payload, JWT_SECRET, {
       expiresIn: process.env.ACCESS_TOKEN_EXPIRES_IN,
     });
-    const refreshToken = sign(payload, process.env.JWT_SECRET, {
+    const refreshToken = sign(payload, JWT_SECRET, {
       expiresIn: process.env.REFRESH_TOKEN_EXPIRES_IN,
     });
     res.cookie('access_token', accessToken, accessCookieOptions);
@@ -209,10 +210,10 @@ export const signInWithGoogle = async (req, res, next) => {
       throw new Error(RESPONSE_MESSAGES.USERS.USER_NOT_EXISTS);
     }
     const payload = { name, _id: isUserExists._id };
-    const accessToken = sign(payload, process.env.JWT_SECRET, {
+    const accessToken = sign(payload, JWT_SECRET, {
       expiresIn: process.env.ACCESS_TOKEN_EXPIRES_IN,
     });
-    const refreshToken = sign(payload, process.env.JWT_SECRET, {
+    const refreshToken = sign(payload, JWT_SECRET, {
       expiresIn: process.env.REFRESH_TOKEN_EXPIRES_IN,
     });
     res.cookie('access_token', accessToken, accessCookieOptions);
@@ -289,10 +290,10 @@ export const signUpWithGithub = async (req, res, next) => {
       email,
     });
     const payload = { name, _id: newUser._id };
-    const accessToken = sign(payload, process.env.JWT_SECRET, {
+    const accessToken = sign(payload, JWT_SECRET, {
       expiresIn: process.env.ACCESS_TOKEN_EXPIRES_IN,
     });
-    const refreshToken = sign(payload, process.env.JWT_SECRET, {
+    const refreshToken = sign(payload, JWT_SECRET, {
       expiresIn: process.env.REFRESH_TOKEN_EXPIRES_IN,
     });
     res.cookie('access_token', accessToken, accessCookieOptions);
@@ -347,10 +348,10 @@ export const signInWithGithub = async (req, res, next) => {
       throw new Error(RESPONSE_MESSAGES.USERS.USER_NOT_EXISTS);
     }
     const payload = { name, _id: isUserExists._id };
-    const accessToken = sign(payload, process.env.JWT_SECRET, {
+    const accessToken = sign(payload, JWT_SECRET, {
       expiresIn: process.env.ACCESS_TOKEN_EXPIRES_IN,
     });
-    const refreshToken = sign(payload, process.env.JWT_SECRET, {
+    const refreshToken = sign(payload, JWT_SECRET, {
       expiresIn: process.env.REFRESH_TOKEN_EXPIRES_IN,
     });
     res.cookie('access_token', accessToken, accessCookieOptions);

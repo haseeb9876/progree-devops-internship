@@ -1,0 +1,105 @@
+name: progree-internship
+
+services:
+  frontend:
+    image: progree-wanderlust-frontend:task2
+    build: ./frontend
+    ports:
+      - "127.0.0.1:${WEB_PORT:-8080}:8080"
+    depends_on:
+      backend:
+        condition: service_healthy
+    networks: [web]
+    read_only: true
+    tmpfs: [/tmp]
+    security_opt: [no-new-privileges:true]
+    cap_drop: [ALL]
+    restart: unless-stopped
+
+  backend:
+    image: progree-wanderlust-backend:task2
+    build: ./backend
+    init: true
+    environment:
+      NODE_ENV: production
+      PORT: "5000"
+      MONGO_HOST: mongodb
+      MONGO_DATABASE: wanderlust
+      MONGO_USER: wanderlust
+      MONGO_PASSWORD_FILE: /run/secrets/mongo_app_password
+      REDIS_URL: redis://redis:6379
+      REDIS_PASSWORD_FILE: /run/secrets/redis_password
+      JWT_SECRET_FILE: /run/secrets/jwt_secret
+      ACCESS_TOKEN_EXPIRES_IN: 15m
+      REFRESH_TOKEN_EXPIRES_IN: 7d
+      COOKIE_SECURE: "false"
+    secrets: [mongo_app_password, redis_password, jwt_secret]
+    depends_on:
+      mongodb:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks: [web, data]
+    read_only: true
+    tmpfs: [/tmp]
+    security_opt: [no-new-privileges:true]
+    cap_drop: [ALL]
+    restart: unless-stopped
+
+  mongodb:
+    image: mongo:8@sha256:5d7043a4ffe02b9ed1b6e0bab057546981af5ca0a79107e9c461e49bc44c0a7b
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD_FILE: /run/secrets/mongo_root_password
+      MONGO_INITDB_DATABASE: wanderlust
+    secrets: [mongo_root_password, mongo_app_password]
+    volumes:
+      - mongo_data:/data/db
+      - mongo_config:/data/configdb
+      - ./docker/mongo/init.js:/docker-entrypoint-initdb.d/01-app-user.js:ro
+    networks: [data]
+    healthcheck:
+      test: [CMD, mongosh, --quiet, --eval, "quit(db.adminCommand('ping').ok ? 0 : 1)"]
+      interval: 10s
+      timeout: 5s
+      start_period: 40s
+      retries: 10
+    restart: unless-stopped
+
+  redis:
+    image: redis:7-alpine@sha256:ff02b58f971e7d7d156a1267e283fcbbeee91773b6aa36c49dac28ecfe28eadf
+    user: redis
+    command: [sh, /usr/local/bin/start-redis.sh]
+    secrets: [redis_password]
+    volumes:
+      - ./docker/redis/start.sh:/usr/local/bin/start-redis.sh:ro
+    networks: [data]
+    read_only: true
+    tmpfs: [/tmp]
+    security_opt: [no-new-privileges:true]
+    cap_drop: [ALL]
+    healthcheck:
+      test: [CMD-SHELL, 'REDISCLI_AUTH="$$(cat /run/secrets/redis_password)" redis-cli ping | grep -qx PONG']
+      interval: 10s
+      timeout: 3s
+      retries: 5
+    restart: unless-stopped
+
+networks:
+  web:
+  data:
+    internal: true
+
+volumes:
+  mongo_data:
+  mongo_config:
+
+secrets:
+  mongo_root_password:
+    file: ./.secrets/mongo_root_password
+  mongo_app_password:
+    file: ./.secrets/mongo_app_password
+  redis_password:
+    file: ./.secrets/redis_password
+  jwt_secret:
+    file: ./.secrets/jwt_secret
