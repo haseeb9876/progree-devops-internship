@@ -117,13 +117,23 @@ Do not run CI cleanup commands against your normal local project.
 
 ## Scope of completion
 
-Completion requires a real successful GitHub Actions deployment run and a
-controlled failed-test run where build/deployment are skipped. Saved evidence
-and the Task 3 report will link those runs. The temporary test environment is
+A real successful GitHub Actions deployment and a controlled failed-test run
+have been verified. Build and deployment were skipped after the deliberate failure.
+See the [saved evidence](evidence/README.md) and [Task 3 PDF](Task-3-CICD-Report.pdf). The temporary test environment is
 removed after verification; the report does not claim a permanent deployment.
 
 The Task 3 PDF is a component for the organizer's final combined internship PDF.
 It is not submitted automatically. Task 4 remains separate work.
+
+## Regenerate the report
+
+With the optional Python `reportlab` package installed:
+
+```bash
+python3 scripts/build-task3-report.py
+```
+
+This reads the saved run evidence. It does not invent new execution results.
 
 ## References
 
