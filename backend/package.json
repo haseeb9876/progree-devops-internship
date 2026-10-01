@@ -13,18 +13,28 @@
     "mongoose": "^8.0.0"
   },
   "scripts": {
-    "test": "jest --watchAll  --detectOpenHandles --verbose --coverage ",
+    "test": "jest --runInBand",
     "start": "node server.js",
     "check": "prettier --check .",
     "format": "prettier --write .",
     "vercel-build": "echo yay",
-    "dev": "nodemon server.js"
+    "dev": "nodemon server.js",
+    "lint": "eslint . --ext .js --max-warnings 0",
+    "test:ci": "jest --ci --runInBand --coverage --coverageReporters=text --coverageReporters=json-summary --json --outputFile=reports/unit-tests.json"
   },
   "jest": {
-    "globalTeardown": "./tests/teardown.js",
     "transform": {
       "^.+\\.js?$": "babel-jest"
-    }
+    },
+    "clearMocks": true,
+    "testMatch": [
+      "**/tests/unit/**/*.test.js"
+    ],
+    "coverageDirectory": "reports/coverage",
+    "collectCoverageFrom": [
+      "controllers/posts-controller.js",
+      "utils/cache-posts.js"
+    ]
   },
   "devDependencies": {
     "@babel/preset-env": "^7.23.2",

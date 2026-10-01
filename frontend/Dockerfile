@@ -9,6 +9,8 @@ ENV VITE_API_PATH=""
 RUN npm run build
 
 FROM nginx:stable-alpine@sha256:0985e772fb9f729e6fa0980da05fca5d9c468e870eed43071545afa9d2e27d94 AS runtime
+ARG APP_REVISION=local
+LABEL org.opencontainers.image.revision=$APP_REVISION
 COPY nginx.conf /etc/nginx/nginx.conf
 COPY --from=build /app/dist /usr/share/nginx/html
 USER nginx

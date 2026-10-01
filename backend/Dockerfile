@@ -5,7 +5,9 @@ COPY package*.json ./
 RUN npm ci --omit=dev --no-audit --no-fund && npm cache clean --force
 
 FROM node:22-alpine@sha256:0a7108bf6c7bf5de370ffb1a3ed6be93d405b43ff159f681a8d18c0e2bc2e402 AS runtime
-ENV NODE_ENV=production PORT=5000
+ARG APP_REVISION=local
+LABEL org.opencontainers.image.revision=$APP_REVISION
+ENV NODE_ENV=production PORT=5000 APP_REVISION=$APP_REVISION
 WORKDIR /app
 COPY --from=dependencies --chown=node:node /app/node_modules ./node_modules
 COPY --chown=node:node package.json server.js ./

@@ -14,3 +14,7 @@ coverage/
 **/dist/
 **/__pycache__/
 *.log
+
+# Generated CI reports
+**/reports/
+.ci-artifacts/

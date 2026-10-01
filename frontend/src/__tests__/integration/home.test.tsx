@@ -1,22 +1,28 @@
+import axios from 'axios';
+import { responseFor } from '../fixtures';
 import HomePage from '@/pages/home-page';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { BrowserRouter } from 'react-router-dom';
 
+jest.mock('axios');
+const mockedGet = jest.mocked(axios.get);
 const mockedUseNavigate = jest.fn();
+beforeEach(() => {
+  mockedGet.mockImplementation((url: string) => Promise.resolve(responseFor(url)));
+});
 
 jest.mock('react-router-dom', () => ({
-  ...(jest.requireActual('react-router-dom') as Record<string, any>),
+  ...jest.requireActual<typeof import('react-router-dom')>('react-router-dom'),
   useNavigate: () => mockedUseNavigate,
 }));
 
 afterEach(() => mockedUseNavigate.mockRestore());
 
-/**
- * To pass/clear test, backend must be running locally.
- */
+// Component integration tests use deterministic API fixtures; no live server is needed.
 describe('Integration Test: Home Route', () => {
-  test('Home Route: Renders home page', async () => {
+  test('Home Route: Renders home page', () => {
+    mockedGet.mockImplementation(() => new Promise(() => {}));
     //ARRANGE
     render(
       <BrowserRouter>
@@ -79,8 +85,8 @@ describe('Integration Test: Home Route', () => {
     expect(natureCategoryPill).toBeInTheDocument();
     await userEvent.click(natureCategoryPill);
     expect(await screen.findByText('Posts related to "Nature"')).toBeInTheDocument();
-    // Strange test got passed api response is 3 over local backend
-    expect(await screen.findAllByTestId('featuredPostCard')).toHaveLength(5);
+    expect(await screen.findAllByTestId('featuredPostCard')).toHaveLength(3);
+    expect(mockedGet).toHaveBeenCalledWith('http://localhost:3001/api/posts/categories/Nature');
   });
   test('Home Route: Verify navigation on post card click under Featured Posts section', async () => {
     //ARRANGE

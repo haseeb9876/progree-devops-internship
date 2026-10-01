@@ -1,5 +1,9 @@
 export default {
   rootDir: 'src',
+  clearMocks: true,
+  testMatch: ['**/*.test.ts', '**/*.test.tsx'],
+  coverageDirectory: '../reports/coverage',
+  collectCoverageFrom: ['utils/slug-generator.ts', 'components/blog-feed.tsx', 'pages/home-page.tsx'],
   preset: 'ts-jest',
   testEnvironment: 'jsdom',
   transform: {

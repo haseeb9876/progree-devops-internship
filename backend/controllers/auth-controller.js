@@ -10,7 +10,7 @@ const { sign } = jwt;
 
 //REGULAR EMAIL PASSWORD STRATEGY
 //1.Sign Up
-export const signUpWithEmail = async (req, res, next) => {
+export const signUpWithEmail = async (req, res) => {
   try {
     const { name, email, password } = req.body;
     if (!name || !email || !password) {
@@ -49,7 +49,7 @@ export const signUpWithEmail = async (req, res, next) => {
 };
 
 //2.Sign In
-export const signInWithEmail = async (req, res, next) => {
+export const signInWithEmail = async (req, res) => {
   try {
     const { email, password } = req.body;
     if (!email || !password) {
@@ -101,7 +101,7 @@ export const signInWithEmail = async (req, res, next) => {
 
 //GOOGLE STRTEGY
 //1.Open google auth window
-export const openGoogleAuthWindow = (req, res, next) => {
+export const openGoogleAuthWindow = (req, res) => {
   const googleAuthUrl = 'https://accounts.google.com/o/oauth2/v2/auth?';
   const params = new URLSearchParams({
     client_id: process.env.GAUTH_CLIENT_ID,
@@ -115,7 +115,7 @@ export const openGoogleAuthWindow = (req, res, next) => {
 };
 
 //2.Sign Up
-export const signUpWithGoogle = async (req, res, next) => {
+export const signUpWithGoogle = async (req, res) => {
   const code = req.query.code;
   if (!code) {
     res.status(HTTP_STATUS.BAD_REQUEST).json({
@@ -178,7 +178,7 @@ export const signUpWithGoogle = async (req, res, next) => {
 };
 
 //3.Sign In
-export const signInWithGoogle = async (req, res, next) => {
+export const signInWithGoogle = async (req, res) => {
   const code = req.query.code;
   if (!code) {
     res.status(HTTP_STATUS.BAD_REQUEST).json({
@@ -239,7 +239,7 @@ export const signInWithGoogle = async (req, res, next) => {
 
 //GITHUB STRATEGY
 //1.Open Github auth window
-export const openGithubAuthWindow = (req, res, next) => {
+export const openGithubAuthWindow = (req, res) => {
   const githubAuthUrl = 'https://github.com/login/oauth/authorize?';
   const params = new URLSearchParams({
     client_id: process.env.GITHUB_CLIENT_ID,
@@ -253,7 +253,7 @@ export const openGithubAuthWindow = (req, res, next) => {
 };
 
 //2.Sign up
-export const signUpWithGithub = async (req, res, next) => {
+export const signUpWithGithub = async (req, res) => {
   const code = req.query.code;
   if (!code) {
     res.status(HTTP_STATUS.BAD_REQUEST).json({
@@ -318,7 +318,7 @@ export const signUpWithGithub = async (req, res, next) => {
 };
 
 //3.Sign In
-export const signInWithGithub = async (req, res, next) => {
+export const signInWithGithub = async (req, res) => {
   const code = req.query.code;
   if (!code) {
     res.status(HTTP_STATUS.BAD_REQUEST).json({
@@ -376,7 +376,7 @@ export const signInWithGithub = async (req, res, next) => {
 };
 
 //Sign Out
-export const signOutUser = async (req, res, next) => {
+export const signOutUser = async (req, res) => {
   try {
     res.cookie('access_token', '', { maxAge: 1 });
     res.cookie('refresh_token', '', { maxAge: 1 });

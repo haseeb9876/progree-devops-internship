@@ -16,7 +16,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cors());
 app.use(cookieParser());
 app.use(compression());
-app.get('/health/live', (req, res) => res.json({ status: 'ok' }));
+app.get('/health/live', (req, res) => res.json({ status: 'ok', revision: process.env.APP_REVISION || 'local' }));
 app.get('/health/ready', (req, res) => {
   const mongodb = mongoose.connection.readyState === 1;
   const redis = !REDIS_URL || Boolean(getRedisClient()?.isReady);
